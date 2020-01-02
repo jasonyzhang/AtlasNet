@@ -172,3 +172,18 @@ class Trainer(TrainerAbstract, TrainerLoss, TrainerIteration, TrainerDataset, Tr
         print(f"Atlasnet generated mesh at {path}!")
         mesh_processor.save(mesh, path, self.colormap)
         return path
+
+    def get_latent_code(self, demo_path):
+        self.data = self.datasets.dataset_train.load(demo_path)
+        self.data = EasyDict(self.data)
+
+        input_path_points = demo_path
+
+        # prepare normalization
+        get_normalization = self.datasets.dataset_train.load(input_path_points)
+        get_normalization = EasyDict(get_normalization)
+
+        self.make_network_input()
+        latent = self.network.module.encoder(self.data.network_input)
+        print(latent.cpu().numpy())
+        return latent

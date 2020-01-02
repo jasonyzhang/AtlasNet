@@ -10,13 +10,14 @@ class EncoderDecoder(nn.Module):
     Author : Thibault Groueix 01.11.2019
     """
 
-    def __init__(self, opt):
+    def __init__(self, opt, encoder_only=False):
         super(EncoderDecoder, self).__init__()
         if opt.SVR:
             self.encoder = resnet.resnet18(pretrained=False, num_classes=opt.bottleneck_size)
         else:
             self.encoder = PointNet(nlatent=opt.bottleneck_size)
 
+        self.encoder_only = encoder_only
         self.decoder = Atlasnet(opt)
         self.to(opt.device)
 
@@ -25,6 +26,8 @@ class EncoderDecoder(nn.Module):
         self.eval()
 
     def forward(self, x, train=True):
+        if self.encoder_only:
+            return self.encoder(x)
         return self.decoder(self.encoder(x), train=train)
 
     def generate_mesh(self, x):

@@ -1,9 +1,11 @@
 import sys
+from glob import glob
 import auxiliary.argument_parser as argument_parser
 import auxiliary.my_utils as my_utils
 import time
 import torch
 from auxiliary.my_utils import yellow_print
+from tqdm import tqdm
 
 """
 Main training script.
@@ -24,7 +26,9 @@ trainer.start_train_time = time.time()
 
 if opt.demo:
     with torch.no_grad():
-        trainer.demo(opt.demo_input_path)
+        # trainer.demo(opt.demo_input_path)
+        fpaths = sorted(glob('dataset/data/ShapeNetV1Renderings/02958343/*/*.png'))
+        trainer.get_latent_code(fpaths[0])
     sys.exit(0)
 
 if opt.run_single_eval:

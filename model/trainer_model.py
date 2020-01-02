@@ -25,7 +25,7 @@ class TrainerModel(object):
             # Run on CPU
             self.opt.device = torch.device(f"cpu")
 
-        self.network = EncoderDecoder(self.opt)
+        self.network = EncoderDecoder(self.opt, encoder_only=True)
         self.network = nn.DataParallel(self.network, device_ids=self.opt.multi_gpu)
 
         self.reload_network()
