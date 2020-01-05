@@ -1,4 +1,5 @@
 import sys
+import ipdb
 from glob import glob
 import auxiliary.argument_parser as argument_parser
 import auxiliary.my_utils as my_utils
@@ -6,6 +7,7 @@ import time
 import torch
 from auxiliary.my_utils import yellow_print
 from tqdm import tqdm
+import pickle
 
 """
 Main training script.
@@ -25,10 +27,17 @@ trainer.build_losses()
 trainer.start_train_time = time.time()
 
 if opt.demo:
+    print('Starting demo')
     with torch.no_grad():
         # trainer.demo(opt.demo_input_path)
-        fpaths = sorted(glob('dataset/data/ShapeNetV1Renderings/02958343/*/*.png'))
-        trainer.get_latent_code(fpaths[0])
+        fpaths = sorted(glob('dataset/data/ShapeNetV1Renderings/02958343/*/rendering/*.png'))
+        latent_codes = []
+        for fpath in tqdm(fpaths):
+            latent_codes.append(trainer.get_latent_code(fpath))
+        import ipdb; ipdb.set_trace()
+        codes = torch.cat(latent_codes, dim=0)
+        codes = codes.cpu().numpy()
+        pickle.dump(codes, open('car_codes.p', 'wb'))
     sys.exit(0)
 
 if opt.run_single_eval:

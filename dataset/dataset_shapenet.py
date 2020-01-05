@@ -265,7 +265,7 @@ class ShapeNet(data.Dataset):
 if __name__ == '__main__':
     print('Testing Shapenet dataset')
     opt = {"normalization": "UnitBall", "class_choice": ["plane"], "SVR": True, "sample": True, "npoints": 2500,
-           "shapenet13": True}
-    d = ShapeNet(EasyDict(opt), train=False, keep_track=True)
+            "shapenet13": True, "demo": False}
+    d = ShapeNet(EasyDict(opt), train=False)
     print(d[1])
     a = len(d)

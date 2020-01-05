@@ -185,5 +185,4 @@ class Trainer(TrainerAbstract, TrainerLoss, TrainerIteration, TrainerDataset, Tr
 
         self.make_network_input()
         latent = self.network.module.encoder(self.data.network_input)
-        print(latent.cpu().numpy())
         return latent
