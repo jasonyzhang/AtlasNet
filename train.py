@@ -8,6 +8,7 @@ import torch
 from auxiliary.my_utils import yellow_print
 from tqdm import tqdm
 import pickle
+import numpy as np
 
 """
 Main training script.
@@ -28,17 +29,25 @@ trainer.start_train_time = time.time()
 
 if opt.demo:
     print('Starting demo')
-    with torch.no_grad():
-        # trainer.demo(opt.demo_input_path)
-        fpaths = sorted(glob('dataset/data/ShapeNetV1Renderings/02958343/*/rendering/*.png'))
-        latent_codes = []
-        for fpath in tqdm(fpaths):
-            latent_codes.append(trainer.get_latent_code(fpath))
-        import ipdb; ipdb.set_trace()
-        codes = torch.cat(latent_codes, dim=0)
-        codes = codes.cpu().numpy()
-        pickle.dump(codes, open('car_codes.p', 'wb'))
-    sys.exit(0)
+    # decode
+    ipdb.set_trace()
+    car_codes = pickle.load(open('car_codes.p', 'rb'))
+    mean_code = np.mean(car_codes, axis=1)
+    mean_code = np.expand_dims(mean_code, 0)
+    trainer.decode(mean_code, 'mean_code.ply')
+
+    # # encode
+    # with torch.no_grad():
+    #     # trainer.demo(opt.demo_input_path)
+    #     fpaths = sorted(glob('dataset/data/ShapeNetV1Renderings/02958343/*/rendering/*.png'))
+    #     latent_codes = []
+    #     for fpath in tqdm(fpaths):
+    #         latent_codes.append(trainer.get_latent_code(fpath))
+    #     import ipdb; ipdb.set_trace()
+    #     codes = torch.cat(latent_codes, dim=0)
+    #     codes = codes.cpu().numpy()
+    #     pickle.dump(codes, open('car_codes.p', 'wb'))
+    # sys.exit(0)
 
 if opt.run_single_eval:
     with torch.no_grad():

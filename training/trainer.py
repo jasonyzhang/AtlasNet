@@ -177,12 +177,35 @@ class Trainer(TrainerAbstract, TrainerLoss, TrainerIteration, TrainerDataset, Tr
         self.data = self.datasets.dataset_train.load(demo_path)
         self.data = EasyDict(self.data)
 
-        input_path_points = demo_path
-
-        # prepare normalization
-        get_normalization = self.datasets.dataset_train.load(input_path_points)
-        get_normalization = EasyDict(get_normalization)
-
         self.make_network_input()
         latent = self.network.module.encoder(self.data.network_input)
         return latent
+
+    def decode(self, code, demo_path):
+        # prepare normalization
+        code = torch.from_numpy(code).to(self.opt.device)
+
+        get_normalization = self.datasets.dataset_train.load()
+        get_normalization = EasyDict(get_normalization)
+
+        self.make_network_input()
+        mesh = self.network.module.decoder.generate_mesh(code)
+        if get_normalization.operation is not None:
+            # Undo any normalization that was used to preprocess the input.
+            vertices = torch.from_numpy(mesh.vertices).clone().unsqueeze(0)
+            get_normalization.operation.invert()
+            unnormalized_vertices = get_normalization.operation.apply(vertices)
+            mesh = pymesh.form_mesh(
+                vertices=unnormalized_vertices.squeeze().numpy(),
+                faces=mesh.faces)
+
+        if self.opt.demo:
+            path = demo_path
+        else:
+            path = '/'.join([self.opt.training_media_path,
+                             str(self.flags.media_count)]) + ".ply"
+            self.flags.media_count += 1
+
+        print(f"Atlasnet generated mesh at {path}!")
+        mesh_processor.save(mesh, path, self.colormap)
+        return path

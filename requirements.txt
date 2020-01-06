@@ -1,11 +1,13 @@
 easydict
 joblib
+ipdb
 matplotlib
 ninja
 numpy
 scipy
 termcolor
 tornado
+tqdm
 urllib3
 visdom
 websocket-client
